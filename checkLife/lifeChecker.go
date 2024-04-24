@@ -1,6 +1,7 @@
 package checklife
 
 type LifeChecker interface {
+	IsInverted() bool
 	GetName() string
-	CheckLife() (bool, error)
+	CheckLife() error
 }

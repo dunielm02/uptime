@@ -10,31 +10,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func setUpTestingService() *httptest.Server {
-	mux := http.NewServeMux()
-
-	mux.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-	})
-
-	mux.HandleFunc("/ping/post", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "POST" {
-			var body map[string]any
-			read, _ := io.ReadAll(r.Body)
-
-			json.Unmarshal(read, &body)
-
-			w.WriteHeader(http.StatusAccepted)
-		} else {
-			w.WriteHeader(http.StatusBadRequest)
-		}
-	})
-
-	server := httptest.NewTLSServer(mux)
-
-	return server
-}
-
 func TestHttpCheckLife(t *testing.T) {
 	server := setUpTestingService()
 
@@ -43,7 +18,6 @@ func TestHttpCheckLife(t *testing.T) {
 			url:                server.URL + "/ping",
 			method:             "GET",
 			client:             server.Client(),
-			requestBody:        nil,
 			expectedStatusCode: 200,
 		}
 
@@ -68,4 +42,76 @@ func TestHttpCheckLife(t *testing.T) {
 
 		assert.Nil(t, err, err)
 	})
+
+	t.Run("proving life by http POST request With headers", func(t *testing.T) {
+		body, _ := json.Marshal(map[string]string{
+			"hola": "hola",
+		})
+		headers := map[string]string{
+			"with_headers": "true",
+		}
+		service := HttpService{
+			url:                server.URL + "/ping/post/with_headers",
+			method:             "POST",
+			client:             server.Client(),
+			requestBody:        body,
+			requestHeaders:     headers,
+			expectedStatusCode: 202,
+		}
+
+		err := service.CheckLife()
+
+		assert.Nil(t, err, err)
+
+		service.requestHeaders["with_headers"] = "false"
+
+		err = service.CheckLife()
+
+		assert.NotNil(t, err, err)
+	})
+}
+
+func setUpTestingService() *httptest.Server {
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+
+	mux.HandleFunc("/ping/post", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "POST" {
+			var body map[string]any
+			read, _ := io.ReadAll(r.Body)
+
+			json.Unmarshal(read, &body)
+
+			w.WriteHeader(http.StatusAccepted)
+		} else {
+			w.WriteHeader(http.StatusBadRequest)
+		}
+	})
+
+	mux.HandleFunc("/ping/post/with_headers", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "POST" {
+			var body map[string]any
+			read, _ := io.ReadAll(r.Body)
+
+			header := r.Header.Get("with_headers")
+
+			if header != "true" {
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
+
+			json.Unmarshal(read, &body)
+
+			w.WriteHeader(http.StatusAccepted)
+		} else {
+			w.WriteHeader(http.StatusBadRequest)
+		}
+	})
+
+	server := httptest.NewTLSServer(mux)
+
+	return server
 }
