@@ -1,7 +1,9 @@
 package checklife
 
+import "time"
+
 type LifeChecker interface {
 	IsInverted() bool
 	GetName() string
-	CheckLife() error
+	CheckLife() (time.Duration, error)
 }
