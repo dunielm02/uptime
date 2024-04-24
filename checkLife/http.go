@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"net/http"
+	"time"
 )
 
 // HttpService represents a service that we will prove
@@ -23,26 +24,27 @@ func (service *HttpService) IsInverted() bool {
 	return service.inverted
 }
 
-func (service *HttpService) CheckLife() error {
+func (service *HttpService) CheckLife() (time.Duration, error) {
 	req, err := http.NewRequest(service.method, service.url, bytes.NewReader(service.requestBody))
 	if err != nil {
-		return fmt.Errorf("error initializing the request: %s", err.Error())
+		return 0, fmt.Errorf("error initializing the request: %s", err.Error())
 	}
 
 	for key, val := range service.requestHeaders {
 		req.Header.Set(key, val)
 	}
-
+	initReq := time.Now()
 	res, err := service.client.Do(req)
+	duration := time.Since(initReq)
 	if err != nil {
-		return fmt.Errorf("error sending the request: %s", err.Error())
+		return 0, fmt.Errorf("error sending the request: %s", err.Error())
 	}
 
 	if res.StatusCode == service.expectedStatusCode {
-		return nil
+		return duration, nil
 	}
 
-	return fmt.Errorf("unexpected status code: %d", res.StatusCode)
+	return 0, fmt.Errorf("unexpected status code: %d", res.StatusCode)
 }
 
 func (service *HttpService) GetName() string {

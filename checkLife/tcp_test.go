@@ -18,7 +18,7 @@ func TestTcpCheckLife(t *testing.T) {
 			port:     8000,
 		}
 
-		err := service.CheckLife()
+		_, err := service.CheckLife()
 
 		assert.Nil(t, err, err)
 	})
@@ -29,7 +29,7 @@ func TestTcpCheckLife(t *testing.T) {
 			port:     8001,
 		}
 
-		err := service.CheckLife()
+		_, err := service.CheckLife()
 
 		assert.NotNil(t, err, err)
 	})

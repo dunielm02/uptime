@@ -21,7 +21,7 @@ func TestHttpCheckLife(t *testing.T) {
 			expectedStatusCode: 200,
 		}
 
-		err := service.CheckLife()
+		_, err := service.CheckLife()
 
 		assert.Nil(t, err, err)
 	})
@@ -38,7 +38,7 @@ func TestHttpCheckLife(t *testing.T) {
 			expectedStatusCode: 202,
 		}
 
-		err := service.CheckLife()
+		_, err := service.CheckLife()
 
 		assert.Nil(t, err, err)
 	})
@@ -59,13 +59,13 @@ func TestHttpCheckLife(t *testing.T) {
 			expectedStatusCode: 202,
 		}
 
-		err := service.CheckLife()
+		_, err := service.CheckLife()
 
 		assert.Nil(t, err, err)
 
 		service.requestHeaders["with_headers"] = "false"
 
-		err = service.CheckLife()
+		_, err = service.CheckLife()
 
 		assert.NotNil(t, err, err)
 	})

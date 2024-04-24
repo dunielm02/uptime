@@ -18,25 +18,26 @@ type PingService struct {
 	inverted    bool `default:"false"`
 }
 
-func (service *PingService) CheckLife() error {
+func (service *PingService) CheckLife() (time.Duration, error) {
 	pinger, err := probing.NewPinger(service.host)
 	if err != nil {
-		return fmt.Errorf("error creating the pinger: %v", err)
+		return 0, fmt.Errorf("error creating the pinger: %v", err)
 	}
 
 	pinger.SetPrivileged(true)
 	pinger.Timeout = time.Duration(service.timeout) * time.Second
 	pinger.Count = service.pingCount
+
 	err = pinger.Run()
 	if err != nil {
-		return fmt.Errorf("error running the pinger: %v", err)
+		return 0, fmt.Errorf("error running the pinger: %v", err)
 	}
 
 	if pinger.Statistics().PacketsRecv < service.mostReceive {
-		return fmt.Errorf("only %d packets were received from %d", service.pingCount, pinger.Statistics().PacketsRecv)
+		return 0, fmt.Errorf("only %d packets were received from %d", service.pingCount, pinger.Statistics().PacketsRecv)
 	}
 
-	return nil
+	return pinger.Statistics().AvgRtt, nil
 }
 
 func (service *PingService) IsInverted() bool {

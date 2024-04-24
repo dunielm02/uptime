@@ -17,7 +17,7 @@ func TestPingCheckLife(t *testing.T) {
 			mostReceive: 4,
 		}
 
-		err := service.CheckLife()
+		_, err := service.CheckLife()
 
 		assert.Nil(t, err, err)
 	})
@@ -30,7 +30,7 @@ func TestPingCheckLife(t *testing.T) {
 			mostReceive: 4,
 		}
 
-		err := service.CheckLife()
+		_, err := service.CheckLife()
 
 		assert.NotNil(t, err, err)
 	})

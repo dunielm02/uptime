@@ -3,6 +3,7 @@ package checklife
 import (
 	"net"
 	"strconv"
+	"time"
 )
 
 type TcpService struct {
@@ -13,16 +14,17 @@ type TcpService struct {
 	inverted bool `default:"false"`
 }
 
-func (service *TcpService) CheckLife() error {
+func (service *TcpService) CheckLife() (time.Duration, error) {
+	initDial := time.Now()
 	conn, err := service.dialer.Dial("tcp", service.hostName+":"+strconv.Itoa(service.port))
-
+	duration := time.Since(initDial)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	err = conn.Close()
 
-	return err
+	return duration, err
 }
 
 func (service *TcpService) GetName() string {
