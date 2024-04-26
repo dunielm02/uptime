@@ -4,7 +4,6 @@ import (
 	"log"
 	"net"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -39,6 +38,13 @@ func TestTcpCheckLife(t *testing.T) {
 func setUpTcpListener() {
 	l, err := net.Listen("tcp", ":8000")
 
+	defer func() {
+		err := l.Close()
+		if err != nil {
+			log.Println(err)
+		}
+	}()
+
 	if err != nil {
 		log.Fatalf("error creating listening: %v", err)
 	}
@@ -50,7 +56,6 @@ func setUpTcpListener() {
 		}
 
 		go func() {
-			time.Sleep(2 * time.Second)
 			conn.Close()
 		}()
 	}
