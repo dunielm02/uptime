@@ -1,8 +1,7 @@
 package portForward
 
 import (
-	"io"
-	"log"
+	"fmt"
 	"net"
 
 	"golang.org/x/crypto/ssh"
@@ -12,38 +11,11 @@ type Tunel struct {
 	username         string
 	password         string
 	serverAddrString string
-	localAddrString  string
+	// localAddrString  string
 	remoteAddrString string
 }
 
-func forward(t *Tunel, localConn net.Conn, config *ssh.ClientConfig) {
-	// Setup sshClientConn (type *ssh.ClientConn)
-	sshClientConn, err := ssh.Dial("tcp", t.serverAddrString, config)
-	if err != nil {
-		log.Fatalf("ssh.Dial failed: %s", err)
-	}
-
-	// Setup sshConn (type net.Conn)
-	sshConn, err := sshClientConn.Dial("tcp", t.remoteAddrString)
-
-	// Copy localConn.Reader to sshConn.Writer
-	go func() {
-		_, err = io.Copy(sshConn, localConn)
-		if err != nil {
-			log.Fatalf("io.Copy failed: %v", err)
-		}
-	}()
-
-	// Copy sshConn.Reader to localConn.Writer
-	go func() {
-		_, err = io.Copy(localConn, sshConn)
-		if err != nil {
-			log.Fatalf("io.Copy failed: %v", err)
-		}
-	}()
-}
-
-func (t *Tunel) Start() {
+func (t *Tunel) Start() (net.Conn, error) {
 	// Setup SSH config (type *ssh.ClientConfig)
 	config := &ssh.ClientConfig{
 		User: t.username,
@@ -52,18 +24,17 @@ func (t *Tunel) Start() {
 		},
 	}
 
-	// Setup localListener (type net.Listener)
-	localListener, err := net.Listen("tcp", t.localAddrString)
+	// Setup sshClientConn (type *ssh.ClientConn)
+	sshClientConn, err := ssh.Dial("tcp", t.serverAddrString, config)
 	if err != nil {
-		log.Fatalf("net.Listen failed: %v", err)
+		return nil, fmt.Errorf("ssh.Dial failed: %s", err)
 	}
 
-	for {
-		// Setup localConn (type net.Conn)
-		localConn, err := localListener.Accept()
-		if err != nil {
-			log.Fatalf("listen.Accept failed: %v", err)
-		}
-		go forward(t, localConn, config)
+	// Setup sshConn (type net.Conn)
+	sshConn, err := sshClientConn.Dial("tcp", t.remoteAddrString)
+	if err != nil {
+		return nil, fmt.Errorf("dial tcp filed by ssh: %s", err)
 	}
+
+	return sshConn, nil
 }
