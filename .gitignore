@@ -1,3 +1,4 @@
 .vscode
 compose.yml
 .env
+options.yml

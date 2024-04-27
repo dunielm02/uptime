@@ -10,7 +10,7 @@ import (
 
 type Selector struct {
 	mu   *sync.Mutex
-	list queue.Queue
+	list *queue.Queue
 }
 
 func NewSelector() Selector {
@@ -27,14 +27,17 @@ func (s *Selector) Insert(service checkers.LifeChecker) {
 	}
 
 	s.mu.Lock()
-	heap.Push(&s.list, &item)
+	heap.Push(s.list, &item)
 	s.mu.Unlock()
 }
 
 func (s *Selector) NextItem() checkers.LifeChecker {
+	if s.list.Len() == 0 {
+		return nil
+	}
 	s.mu.Lock()
 
-	ret := heap.Pop(&s.list).(checkers.LifeChecker)
+	ret := heap.Pop(s.list).(checkers.LifeChecker)
 
 	s.mu.Unlock()
 

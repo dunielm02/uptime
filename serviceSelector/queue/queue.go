@@ -18,7 +18,7 @@ func (pq Queue) Len() int {
 }
 
 func (pq Queue) Less(i, j int) bool {
-	return pq[i].Priority.Compare(pq[i].Priority) > 0
+	return pq[i].Priority.Before(pq[j].Priority)
 }
 
 func (pq Queue) Swap(i, j int) {
@@ -26,26 +26,22 @@ func (pq Queue) Swap(i, j int) {
 }
 
 func (pq *Queue) Push(x any) {
-	item := x.(*QueueItem)
-	*pq = append(*pq, item)
+	value := x.(*QueueItem)
+	*pq = append(*pq, value)
 }
 
 func (pq *Queue) Pop() any {
-	old := *pq
-	n := len(old)
-	if n == 0 {
-		return nil
-	}
-	item := old[n-1]
-	old[n-1] = nil // avoid memory leak
-	*pq = old[0 : n-1]
-	return item.Service
+	n := pq.Len()
+	ret := (*pq)[n-1]
+	*pq = (*pq)[0 : n-1]
+
+	return ret.Service
 }
 
-func NewQueue() Queue {
-	var queue = Queue{}
+func NewQueue() *Queue {
+	var queue = &Queue{}
 
-	heap.Init(&queue)
+	heap.Init(queue)
 
-	return Queue{}
+	return queue
 }
