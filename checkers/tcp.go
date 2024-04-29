@@ -21,8 +21,7 @@ func (service *TcpService) CheckLife() (time.Duration, error) {
 	if err != nil {
 		return 0, err
 	}
-
-	err = conn.Close()
+	defer conn.Close()
 
 	return duration, err
 }

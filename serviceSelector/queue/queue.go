@@ -35,7 +35,7 @@ func (pq *Queue) Pop() any {
 	ret := (*pq)[n-1]
 	*pq = (*pq)[0 : n-1]
 
-	return ret.Service
+	return ret
 }
 
 func NewQueue() *Queue {

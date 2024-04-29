@@ -3,7 +3,6 @@ package queue
 import (
 	"container/heap"
 	"fmt"
-	"lifeChecker/checkers"
 	"math/rand"
 	"sort"
 	"testing"
@@ -44,7 +43,7 @@ func TestQueue(t *testing.T) {
 	})
 
 	for i := range slice {
-		queueValue := heap.Pop(queue).(checkers.LifeChecker)
-		assert.Equal(t, fmt.Sprint(slice[i].Unix()), queueValue.GetName())
+		queueValue := heap.Pop(queue).(*QueueItem)
+		assert.Equal(t, slice[i].Compare(queueValue.Priority), 0)
 	}
 }
