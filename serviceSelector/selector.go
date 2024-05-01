@@ -3,19 +3,19 @@ package serviceSelector
 import (
 	"container/heap"
 	"lifeChecker/checkers"
-	"lifeChecker/database"
 	"lifeChecker/serviceSelector/queue"
+	"sync"
 	"time"
 )
 
-// This should support concurrent access
-
 type Selector struct {
+	mu   *sync.RWMutex
 	list *queue.Queue
 }
 
 func NewSelector() *Selector {
 	return &Selector{
+		mu:   &sync.RWMutex{},
 		list: queue.NewQueue(),
 	}
 }
@@ -25,50 +25,56 @@ func (s *Selector) Insert(service checkers.LifeChecker) {
 		Priority: time.Now().Add(service.GetQueueTime()),
 		Service:  service,
 	}
-
+	s.mu.Lock()
 	heap.Push(s.list, &item)
+	s.mu.Unlock()
 }
 
 func (s *Selector) NextItem() (checkers.LifeChecker, time.Time) {
-	if s.list.Len() == 0 {
+	if s.len() == 0 {
 		return nil, time.Time{}
 	}
 
+	s.mu.Lock()
 	ret := heap.Pop(s.list).(*queue.QueueItem)
+	s.mu.Unlock()
 
 	return ret.Service, ret.Priority
 }
 
 func (s *Selector) len() int {
-	return len(*s.list)
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	return s.list.Len()
 }
 
-func (s *Selector) RunChecking(database.DB) {
-	var lifeResult = make(chan database.TimeSerie)
-	for {
-		if s.len() == 0 {
-			continue
-		}
+// func (s *Selector) RunChecking(database.DB) {
+// 	var lifeResult = make(chan database.TimeSerie)
+// 	for {
+// 		if s.len() == 0 {
+// 			continue
+// 		}
 
-		service, initTime := s.NextItem()
+// 		service, initTime := s.NextItem()
 
-		time.Sleep(time.Until(initTime))
+// 		time.Sleep(time.Until(initTime))
 
-		go func(serv checkers.LifeChecker) {
-			alive := true
-			requestDuration, err := serv.CheckLife()
+// 		go func(serv checkers.LifeChecker) {
+// 			alive := true
+// 			requestDuration, err := serv.CheckLife()
 
-			if err != nil {
-				if !serv.IsInverted() {
-					alive = false
-				}
-			}
+// 			if err != nil {
+// 				if !serv.IsInverted() {
+// 					alive = false
+// 				}
+// 			}
 
-			lifeResult <- database.TimeSerie{
-				Name:        serv.GetName(),
-				RequestTime: requestDuration,
-				Alive:       alive,
-			}
-		}(service)
-	}
-}
+// 			lifeResult <- database.TimeSerie{
+// 				Name:        serv.GetName(),
+// 				RequestTime: requestDuration,
+// 				Alive:       alive,
+// 			}
+// 		}(service)
+// 	}
+// }

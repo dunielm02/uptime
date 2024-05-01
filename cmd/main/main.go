@@ -3,38 +3,55 @@ package main
 import (
 	"container/heap"
 	"fmt"
-
-	_ "github.com/joho/godotenv/autoload"
+	que "lifeChecker/serviceSelector/queue"
+	"math/rand"
+	"sync"
+	"time"
 )
 
-type IntHeap []int
-
-func (h IntHeap) Len() int           { return len(h) }
-func (h IntHeap) Less(i, j int) bool { return h[i] < h[j] }
-func (h IntHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
-
-func (h *IntHeap) Push(x any) {
-	// Push and Pop use pointer receivers because they modify the slice's length,
-	// not just its contents.
-	*h = append(*h, x.(int))
+type mock_checkLifeService struct {
+	name string
 }
 
-func (h *IntHeap) Pop() any {
-	old := *h
-	n := len(old)
-	x := old[n-1]
-	*h = old[0 : n-1]
-	return x
+func (s *mock_checkLifeService) GetName() string {
+	return s.name
 }
 
-// This example inserts several ints into an IntHeap, checks the minimum,
-// and removes them in order of priority.
+func (s *mock_checkLifeService) CheckLife() (time.Duration, error) { return time.Duration(0), nil }
+func (s *mock_checkLifeService) IsInverted() bool                  { return true }
+func (s *mock_checkLifeService) GetQueueTime() time.Duration       { return time.Duration(0) }
+
 func main() {
-	h := &IntHeap{2, 1, 5}
-	heap.Init(h)
-	heap.Push(h, 3)
-	fmt.Printf("minimum: %d\n", (*h)[0])
-	for h.Len() > 0 {
-		fmt.Printf("%d ", heap.Pop(h))
+	var queue = que.NewQueue()
+	wg := sync.WaitGroup{}
+
+	for range 10 {
+		value := time.Now().Add(time.Duration(rand.Int()))
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			heap.Push(queue, &que.QueueItem{
+				Priority: value,
+				Service: &mock_checkLifeService{
+					name: fmt.Sprint(value.Unix()),
+				},
+			})
+		}()
 	}
+
+	wg.Wait()
+
+	fmt.Println("=======================")
+
+	wg2 := sync.WaitGroup{}
+
+	for range 10 {
+		wg2.Add(1)
+		go func() {
+			defer wg2.Done()
+			heap.Pop(queue)
+		}()
+	}
+
+	wg2.Wait()
 }

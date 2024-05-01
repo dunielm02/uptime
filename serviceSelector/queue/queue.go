@@ -13,28 +13,27 @@ type QueueItem struct {
 
 type Queue []*QueueItem
 
-func (pq Queue) Len() int {
-	return len(pq)
+func (q *Queue) Len() int {
+	return len(*q)
 }
 
-func (pq Queue) Less(i, j int) bool {
-	return pq[i].Priority.Before(pq[j].Priority)
+func (q *Queue) Less(i, j int) bool {
+	return (*q)[i].Priority.Before((*q)[j].Priority)
 }
 
-func (pq Queue) Swap(i, j int) {
-	pq[i], pq[j] = pq[j], pq[i]
+func (q *Queue) Swap(i, j int) {
+	(*q)[i], (*q)[j] = (*q)[j], (*q)[i]
 }
 
-func (pq *Queue) Push(x any) {
+func (q *Queue) Push(x any) {
 	value := x.(*QueueItem)
-	*pq = append(*pq, value)
+	(*q) = append((*q), value)
 }
 
-func (pq *Queue) Pop() any {
-	n := pq.Len()
-	ret := (*pq)[n-1]
-	*pq = (*pq)[0 : n-1]
-
+func (q *Queue) Pop() any {
+	n := q.Len()
+	ret := (*q)[n-1]
+	(*q) = (*q)[0:(n - 1)]
 	return ret
 }
 
