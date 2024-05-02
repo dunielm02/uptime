@@ -11,7 +11,8 @@ type TcpService struct {
 	hostName string
 	port     int
 	dialer   net.Dialer
-	inverted bool `default:"false"`
+	timeout  int
+	inverted bool
 }
 
 func (service *TcpService) CheckLife() (time.Duration, error) {

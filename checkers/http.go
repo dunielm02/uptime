@@ -17,7 +17,8 @@ type HttpService struct {
 	requestBody        []byte
 	requestHeaders     map[string]string
 	expectedStatusCode int
-	inverted           bool `default:"false"`
+	timeout            int
+	inverted           bool
 }
 
 func (service *HttpService) IsInverted() bool {

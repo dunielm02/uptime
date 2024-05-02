@@ -15,7 +15,7 @@ type PingService struct {
 	timeout     int
 	pingCount   int
 	mostReceive int
-	inverted    bool `default:"false"`
+	inverted    bool
 }
 
 func (service *PingService) CheckLife() (time.Duration, error) {
