@@ -2,7 +2,9 @@ package serviceSelector
 
 import (
 	"container/heap"
+	"context"
 	"lifeChecker/checkers"
+	"lifeChecker/database"
 	"lifeChecker/serviceSelector/queue"
 	"sync"
 	"time"
@@ -30,16 +32,22 @@ func (s *Selector) Insert(service checkers.LifeChecker) {
 	s.mu.Unlock()
 }
 
-func (s *Selector) NextItem() (checkers.LifeChecker, time.Time) {
-	if s.len() == 0 {
-		return nil, time.Time{}
-	}
-
+func (s *Selector) NextItem() checkers.LifeChecker {
 	s.mu.Lock()
 	ret := heap.Pop(s.list).(*queue.QueueItem)
 	s.mu.Unlock()
 
-	return ret.Service, ret.Priority
+	return ret.Service
+}
+
+func (s *Selector) ItsTimeToCheck() bool {
+	if s.len() == 0 {
+		return false
+	}
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	return time.Now().Compare((*s.list)[0].Priority) >= 0
 }
 
 func (s *Selector) len() int {
@@ -49,32 +57,34 @@ func (s *Selector) len() int {
 	return s.list.Len()
 }
 
-// func (s *Selector) RunChecking(database.DB) {
-// 	var lifeResult = make(chan database.TimeSerie)
-// 	for {
-// 		if s.len() == 0 {
-// 			continue
-// 		}
+func (s *Selector) RunChecking(ctx context.Context, db database.DB) {
+	var lifeResult = make(chan database.TimeSerie)
+	go db.WriteTimeSerieFromChannel(ctx, lifeResult)
+	for ctx.Err() == nil {
+		for !s.ItsTimeToCheck() {
+		}
 
-// 		service, initTime := s.NextItem()
+		service := s.NextItem()
 
-// 		time.Sleep(time.Until(initTime))
+		go func(serv checkers.LifeChecker) {
+			alive := true
+			requestDuration, err := serv.CheckLife()
 
-// 		go func(serv checkers.LifeChecker) {
-// 			alive := true
-// 			requestDuration, err := serv.CheckLife()
+			if err != nil {
+				if !serv.IsInverted() {
+					alive = false
+				}
+			}
 
-// 			if err != nil {
-// 				if !serv.IsInverted() {
-// 					alive = false
-// 				}
-// 			}
+			toSend := database.TimeSerie{
+				Name:        serv.GetName(),
+				RequestTime: requestDuration,
+				Alive:       alive,
+			}
 
-// 			lifeResult <- database.TimeSerie{
-// 				Name:        serv.GetName(),
-// 				RequestTime: requestDuration,
-// 				Alive:       alive,
-// 			}
-// 		}(service)
-// 	}
-// }
+			lifeResult <- toSend
+
+			s.Insert(serv)
+		}(service)
+	}
+}
