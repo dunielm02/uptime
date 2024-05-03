@@ -2,46 +2,30 @@ package database
 
 import (
 	"context"
-	"os"
+	"lifeChecker/config"
 	"time"
 
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/api/write"
 )
 
-type DB interface {
-	WriteTimeSerie(TimeSerie) error
-	WriteTimeSerieFromChannel(context.Context, <-chan TimeSerie) error
-	Connect() error
-	CloseConnection() error
-}
-
 type Influx struct {
-	client          influxdb2.Client
-	influxdb_token  string
-	influxdb_url    string
-	influxdb_org    string
-	Influxdb_bucket string
+	client influxdb2.Client
+	influxSpec
 }
 
-type TimeSerie struct {
-	Name        string
-	RequestTime time.Duration
-	Alive       bool
+type influxSpec struct {
+	influxdb_token       string
+	influxdb_url         string
+	influxdb_org         string
+	influxdb_bucket      string
+	influxdb_measurement string
 }
 
-// NewInfluxFromYml Not Yet
-func NewInfluxFromYml() Influx {
-	return Influx{}
-}
+func newInfluxFromConfig(dbc config.DatabaseConfig) Influx {
+	spec := dbc.Spec.(influxSpec)
 
-func NewInfluxFromEnv() Influx {
-	return Influx{
-		influxdb_token:  os.Getenv("INFLUXDB_TOKEN"),
-		influxdb_url:    os.Getenv("INFLUXDB_URL"),
-		influxdb_org:    os.Getenv("myOrg"),
-		Influxdb_bucket: os.Getenv("INFLUXDB_BUCKET"),
-	}
+	return Influx{nil, spec}
 }
 
 func (db *Influx) WriteTimeSerieFromChannel(ctx context.Context, data <-chan TimeSerie) error {
@@ -56,7 +40,7 @@ func (db *Influx) WriteTimeSerieFromChannel(ctx context.Context, data <-chan Tim
 }
 
 func (db *Influx) WriteTimeSerie(serie TimeSerie) error {
-	writeAPI := db.client.WriteAPIBlocking(db.influxdb_org, db.Influxdb_bucket)
+	writeAPI := db.client.WriteAPIBlocking(db.influxdb_org, db.influxdb_bucket)
 
 	tags := map[string]string{
 		"name": serie.Name,
@@ -67,7 +51,7 @@ func (db *Influx) WriteTimeSerie(serie TimeSerie) error {
 		"alive": serie.Alive,
 	}
 
-	point := write.NewPoint("measurement1", tags, fields, time.Now())
+	point := write.NewPoint(db.influxdb_measurement, tags, fields, time.Now())
 
 	if err := writeAPI.WritePoint(context.Background(), point); err != nil {
 		return err
@@ -77,7 +61,7 @@ func (db *Influx) WriteTimeSerie(serie TimeSerie) error {
 }
 
 func (db *Influx) Connect() error {
-	db.client = influxdb2.NewClient(db.influxdb_url, db.influxdb_org)
+	db.client = influxdb2.NewClient(db.influxdb_url, db.influxdb_token)
 	return nil
 }
 

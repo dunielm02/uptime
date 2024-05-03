@@ -4,6 +4,7 @@ import (
 	"container/heap"
 	"context"
 	"lifeChecker/checkers"
+	"lifeChecker/config"
 	"lifeChecker/database"
 	"lifeChecker/serviceSelector/queue"
 	"sync"
@@ -13,6 +14,10 @@ import (
 type Selector struct {
 	mu   *sync.RWMutex
 	list *queue.Queue
+}
+
+func SelectorFromConfig(cfg []config.ServiceConfig) {
+	
 }
 
 func NewSelector() *Selector {

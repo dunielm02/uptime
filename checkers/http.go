@@ -3,6 +3,7 @@ package checkers
 import (
 	"bytes"
 	"fmt"
+	"lifeChecker/config"
 	"net/http"
 	"time"
 )
@@ -10,19 +11,35 @@ import (
 // HttpService represents a service that we will prove
 // is it is alive via http(s)
 type HttpService struct {
-	name               string
+	name        string
+	client      *http.Client
+	inverted    bool
+	WaitingTime time.Duration
+	HttpServiceSpec
+}
+
+type HttpServiceSpec struct {
 	url                string
 	method             string
-	client             *http.Client
 	requestBody        []byte
 	requestHeaders     map[string]string
 	expectedStatusCode int
-	timeout            int
-	inverted           bool
 }
 
-func (service *HttpService) IsInverted() bool {
-	return service.inverted
+func getHttpServiceFromConfig(cfg config.ServiceConfig) *HttpService {
+	spec := cfg.Spec.(HttpServiceSpec)
+
+	client := &http.Client{
+		Timeout: time.Duration(cfg.Timeout) * time.Second,
+	}
+
+	return &HttpService{
+		name:            cfg.Name,
+		HttpServiceSpec: spec,
+		inverted:        cfg.Inverted,
+		WaitingTime:     time.Duration(cfg.WaitingTime) * time.Second,
+		client:          client,
+	}
 }
 
 func (service *HttpService) CheckLife() (time.Duration, error) {
@@ -50,4 +67,12 @@ func (service *HttpService) CheckLife() (time.Duration, error) {
 
 func (service *HttpService) GetName() string {
 	return service.name
+}
+
+func (service *HttpService) IsInverted() bool {
+	return service.inverted
+}
+
+func (service *HttpService) GetQueueTime() time.Duration {
+	return service.WaitingTime
 }
