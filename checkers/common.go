@@ -18,7 +18,9 @@ func GetFromConfig(cfg config.ServiceConfig) LifeChecker {
 	case "http":
 		return getHttpServiceFromConfig(cfg)
 	case "tcp":
+		return getTcpServiceFromConfig(cfg)
 	case "ping":
+		return getPingServiceFromConfig(cfg)
 	default:
 		log.Printf("The type: %s is not recognized.\n", cfg.Type)
 	}

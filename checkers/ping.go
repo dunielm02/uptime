@@ -2,6 +2,7 @@ package checkers
 
 import (
 	"fmt"
+	"lifeChecker/config"
 	"time"
 
 	probing "github.com/prometheus-community/pro-bing"
@@ -11,11 +12,28 @@ import (
 
 type PingService struct {
 	name        string
-	host        string
 	timeout     int
+	waitingTime time.Duration
+	inverted    bool
+	PingServiceSpec
+}
+
+type PingServiceSpec struct {
+	host        string
 	pingCount   int
 	mostReceive int
-	inverted    bool
+}
+
+func getPingServiceFromConfig(cfg config.ServiceConfig) *PingService {
+	spec := cfg.Spec.(PingServiceSpec)
+
+	return &PingService{
+		name:            cfg.Name,
+		timeout:         cfg.Timeout,
+		waitingTime:     time.Duration(cfg.WaitingTime) * time.Second,
+		inverted:        cfg.Inverted,
+		PingServiceSpec: spec,
+	}
 }
 
 func (service *PingService) CheckLife() (time.Duration, error) {
@@ -38,6 +56,10 @@ func (service *PingService) CheckLife() (time.Duration, error) {
 	}
 
 	return pinger.Statistics().AvgRtt, nil
+}
+
+func (service *PingService) GetQueueTime() time.Duration {
+	return service.waitingTime
 }
 
 func (service *PingService) IsInverted() bool {

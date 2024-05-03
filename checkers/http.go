@@ -14,7 +14,7 @@ type HttpService struct {
 	name        string
 	client      *http.Client
 	inverted    bool
-	WaitingTime time.Duration
+	waitingTime time.Duration
 	HttpServiceSpec
 }
 
@@ -37,7 +37,7 @@ func getHttpServiceFromConfig(cfg config.ServiceConfig) *HttpService {
 		name:            cfg.Name,
 		HttpServiceSpec: spec,
 		inverted:        cfg.Inverted,
-		WaitingTime:     time.Duration(cfg.WaitingTime) * time.Second,
+		waitingTime:     time.Duration(cfg.WaitingTime) * time.Second,
 		client:          client,
 	}
 }
@@ -74,5 +74,5 @@ func (service *HttpService) IsInverted() bool {
 }
 
 func (service *HttpService) GetQueueTime() time.Duration {
-	return service.WaitingTime
+	return service.waitingTime
 }

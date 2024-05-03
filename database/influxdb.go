@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"lifeChecker/config"
+	"log"
 	"time"
 
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
@@ -25,7 +26,10 @@ type influxSpec struct {
 func newInfluxFromConfig(dbc config.DatabaseConfig) Influx {
 	spec := dbc.Spec.(influxSpec)
 
-	return Influx{nil, spec}
+	return Influx{
+		client:     nil,
+		influxSpec: spec,
+	}
 }
 
 func (db *Influx) WriteTimeSerieFromChannel(ctx context.Context, data <-chan TimeSerie) error {
@@ -34,7 +38,10 @@ func (db *Influx) WriteTimeSerieFromChannel(ctx context.Context, data <-chan Tim
 		case <-ctx.Done():
 			return ctx.Err()
 		case i := <-data:
-			db.WriteTimeSerie(i)
+			err := db.WriteTimeSerie(i)
+			if err != nil {
+				log.Println("there was an error writing to influxdb: ", err)
+			}
 		}
 	}
 }
