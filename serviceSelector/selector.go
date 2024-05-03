@@ -16,8 +16,14 @@ type Selector struct {
 	list *queue.Queue
 }
 
-func SelectorFromConfig(cfg []config.ServiceConfig) {
-	
+func SelectorFromConfig(cfg []config.ServiceConfig) *Selector {
+	selector := NewSelector()
+
+	for _, i := range cfg {
+		selector.Insert(checkers.GetFromConfig(i))
+	}
+
+	return selector
 }
 
 func NewSelector() *Selector {
