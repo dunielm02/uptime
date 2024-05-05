@@ -1,0 +1,43 @@
+database:
+  type: influxdb
+  spec:
+    token: DA8osWZB208kHI7CpQVn1Fz0E_gXsrTfk2oz0_U0XkfKNUwQ224cShAz2_nh_j84TgrvD5Y8mw8X1Ag4uHG7mg==
+    url: http://localhost:8086
+    org: myOrg
+    bucket: firstBucket
+    measurement: services
+services:
+  - name: My Http Service
+    type: http
+    timeout: 30
+    waiting-time: 60
+    inverted: false
+    spec:
+      url: google.com
+      method: POST
+      headers:
+        content-type: application/json
+        authentication: bearer 
+      expected-status: 201
+      body: '{"ID": 4524}'
+  - name: My Tcp Service
+    type: tcp
+    timeout: 30
+    inverted: false
+    spec:
+      host: google.com
+      port: 3000
+  - name: My Ping Service
+    type: ping
+    timeout: 30
+    inverted: false
+    spec:
+      host: www.google.com
+      ping-count: 4
+      most-receive: 4
+port-forward:
+  host:
+  remote-address:
+  local-port:
+  username:
+  password:

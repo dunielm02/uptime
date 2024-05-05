@@ -8,6 +8,7 @@ import (
 
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/api/write"
+	"github.com/mitchellh/mapstructure"
 )
 
 type Influx struct {
@@ -16,15 +17,20 @@ type Influx struct {
 }
 
 type influxSpec struct {
-	influxdb_token       string
-	influxdb_url         string
-	influxdb_org         string
-	influxdb_bucket      string
-	influxdb_measurement string
+	Influxdb_token       string `mapstructure:"token"`
+	Influxdb_url         string `mapstructure:"url"`
+	Influxdb_org         string `mapstructure:"org"`
+	Influxdb_bucket      string `mapstructure:"bucket"`
+	Influxdb_measurement string `mapstructure:"measurement"`
 }
 
 func newInfluxFromConfig(dbc config.DatabaseConfig) Influx {
-	spec := dbc.Spec.(influxSpec)
+	var spec influxSpec
+
+	err := mapstructure.Decode(dbc.Spec, &spec)
+	if err != nil {
+		log.Fatal("error converting database spec: ", err)
+	}
 
 	return Influx{
 		client:     nil,
@@ -47,7 +53,7 @@ func (db *Influx) WriteTimeSerieFromChannel(ctx context.Context, data <-chan Tim
 }
 
 func (db *Influx) WriteTimeSerie(serie TimeSerie) error {
-	writeAPI := db.client.WriteAPIBlocking(db.influxdb_org, db.influxdb_bucket)
+	writeAPI := db.client.WriteAPIBlocking(db.Influxdb_org, db.Influxdb_bucket)
 
 	tags := map[string]string{
 		"name": serie.Name,
@@ -58,7 +64,7 @@ func (db *Influx) WriteTimeSerie(serie TimeSerie) error {
 		"alive": serie.Alive,
 	}
 
-	point := write.NewPoint(db.influxdb_measurement, tags, fields, time.Now())
+	point := write.NewPoint(db.Influxdb_measurement, tags, fields, time.Now())
 
 	if err := writeAPI.WritePoint(context.Background(), point); err != nil {
 		return err
@@ -68,7 +74,7 @@ func (db *Influx) WriteTimeSerie(serie TimeSerie) error {
 }
 
 func (db *Influx) Connect() error {
-	db.client = influxdb2.NewClient(db.influxdb_url, db.influxdb_token)
+	db.client = influxdb2.NewClient(db.Influxdb_url, db.Influxdb_token)
 	return nil
 }
 

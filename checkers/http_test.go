@@ -16,9 +16,9 @@ func TestHttpCheckLife(t *testing.T) {
 	t.Run("proving life by http GET request", func(t *testing.T) {
 		service := HttpService{
 			HttpServiceSpec: HttpServiceSpec{
-				url:                server.URL + "/ping",
-				method:             "GET",
-				expectedStatusCode: 200,
+				Url:                server.URL + "/ping",
+				Method:             "GET",
+				ExpectedStatusCode: 200,
 			},
 			client: server.Client(),
 		}
@@ -34,10 +34,10 @@ func TestHttpCheckLife(t *testing.T) {
 		})
 		service := HttpService{
 			HttpServiceSpec: HttpServiceSpec{
-				url:                server.URL + "/ping/post",
-				method:             "POST",
-				requestBody:        body,
-				expectedStatusCode: 202,
+				Url:                server.URL + "/ping/post",
+				Method:             "POST",
+				RequestBody:        string(body),
+				ExpectedStatusCode: 202,
 			},
 			client: server.Client(),
 		}
@@ -56,11 +56,11 @@ func TestHttpCheckLife(t *testing.T) {
 		}
 		service := HttpService{
 			HttpServiceSpec: HttpServiceSpec{
-				url:                server.URL + "/ping/post/with_headers",
-				method:             "POST",
-				requestBody:        body,
-				requestHeaders:     headers,
-				expectedStatusCode: 202,
+				Url:                server.URL + "/ping/post/with_headers",
+				Method:             "POST",
+				RequestBody:        string(body),
+				RequestHeaders:     headers,
+				ExpectedStatusCode: 202,
 			},
 			client: server.Client(),
 		}
@@ -69,7 +69,7 @@ func TestHttpCheckLife(t *testing.T) {
 
 		assert.Nil(t, err, err)
 
-		service.requestHeaders["with_headers"] = "false"
+		service.RequestHeaders["with_headers"] = "false"
 
 		_, err = service.CheckLife()
 

@@ -2,9 +2,12 @@ package checkers
 
 import (
 	"lifeChecker/config"
+	"log"
 	"net"
 	"strconv"
 	"time"
+
+	"github.com/mitchellh/mapstructure"
 )
 
 type TcpService struct {
@@ -16,26 +19,34 @@ type TcpService struct {
 }
 
 type TcpServiceSpec struct {
-	hostName string
-	port     int
+	HostName string `mapstructure:"host"`
+	Port     int    `mapstructure:"port"`
 }
 
 func getTcpServiceFromConfig(cfg config.ServiceConfig) *TcpService {
+	var spec TcpServiceSpec
+
+	err := mapstructure.Decode(cfg.Spec, &spec)
+	if err != nil {
+		log.Fatal("error converting tcp spec: ", err)
+	}
+
 	dialer := net.Dialer{
 		Timeout: time.Duration(cfg.Timeout) * time.Second,
 	}
 
 	return &TcpService{
-		name:        cfg.Name,
-		waitingTime: time.Duration(cfg.WaitingTime) * time.Second,
-		dialer:      dialer,
-		inverted:    cfg.Inverted,
+		name:           cfg.Name,
+		waitingTime:    time.Duration(cfg.WaitingTime) * time.Second,
+		dialer:         dialer,
+		inverted:       cfg.Inverted,
+		TcpServiceSpec: spec,
 	}
 }
 
 func (service *TcpService) CheckLife() (time.Duration, error) {
 	initDial := time.Now()
-	conn, err := service.dialer.Dial("tcp", service.hostName+":"+strconv.Itoa(service.port))
+	conn, err := service.dialer.Dial("tcp", service.HostName+":"+strconv.Itoa(service.Port))
 	duration := time.Since(initDial)
 	if err != nil {
 		return 0, err

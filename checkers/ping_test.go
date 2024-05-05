@@ -12,9 +12,9 @@ func TestPingCheckLife(t *testing.T) {
 	t.Run("Accepted ping", func(t *testing.T) {
 		service := PingService{
 			PingServiceSpec: PingServiceSpec{
-				host:        "127.0.0.1",
-				pingCount:   4,
-				mostReceive: 4,
+				Host:        "127.0.0.1",
+				PingCount:   4,
+				MostReceive: 4,
 			},
 			timeout: 5,
 		}
@@ -27,9 +27,9 @@ func TestPingCheckLife(t *testing.T) {
 	t.Run("Failing Ping: Host Does not Exist", func(t *testing.T) {
 		service := PingService{
 			PingServiceSpec: PingServiceSpec{
-				host:        "192.168.255.255",
-				pingCount:   4,
-				mostReceive: 4,
+				Host:        "192.168.255.255",
+				PingCount:   4,
+				MostReceive: 4,
 			},
 			timeout: 5,
 		}

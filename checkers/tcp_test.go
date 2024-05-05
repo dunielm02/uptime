@@ -14,8 +14,8 @@ func TestTcpCheckLife(t *testing.T) {
 	t.Run("Accepted tcp connection", func(t *testing.T) {
 		service := TcpService{
 			TcpServiceSpec: TcpServiceSpec{
-				hostName: "localhost",
-				port:     8000,
+				HostName: "localhost",
+				Port:     8000,
 			},
 		}
 
@@ -27,8 +27,8 @@ func TestTcpCheckLife(t *testing.T) {
 	t.Run("Refused tcp connection", func(t *testing.T) {
 		service := TcpService{
 			TcpServiceSpec: TcpServiceSpec{
-				hostName: "localhost",
-				port:     8001,
+				HostName: "localhost",
+				Port:     8001,
 			},
 		}
 

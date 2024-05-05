@@ -4,8 +4,11 @@ import (
 	"bytes"
 	"fmt"
 	"lifeChecker/config"
+	"log"
 	"net/http"
 	"time"
+
+	"github.com/mitchellh/mapstructure"
 )
 
 // HttpService represents a service that we will prove
@@ -19,15 +22,24 @@ type HttpService struct {
 }
 
 type HttpServiceSpec struct {
-	url                string
-	method             string
-	requestBody        []byte
-	requestHeaders     map[string]string
-	expectedStatusCode int
+	Url                string            `mapstructure:"url"`
+	Method             string            `mapstructure:"method"`
+	RequestBody        string            `mapstructure:"body"`
+	RequestHeaders     map[string]string `mapstructure:"headers"`
+	ExpectedStatusCode int               `mapstructure:"expected-status"`
 }
 
 func getHttpServiceFromConfig(cfg config.ServiceConfig) *HttpService {
-	spec := cfg.Spec.(HttpServiceSpec)
+	var spec HttpServiceSpec
+
+	fmt.Println(cfg.Spec)
+
+	err := mapstructure.Decode(cfg.Spec, &spec)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(spec)
 
 	client := &http.Client{
 		Timeout: time.Duration(cfg.Timeout) * time.Second,
@@ -43,12 +55,12 @@ func getHttpServiceFromConfig(cfg config.ServiceConfig) *HttpService {
 }
 
 func (service *HttpService) CheckLife() (time.Duration, error) {
-	req, err := http.NewRequest(service.method, service.url, bytes.NewReader(service.requestBody))
+	req, err := http.NewRequest(service.Method, service.Url, bytes.NewReader([]byte(service.RequestBody)))
 	if err != nil {
 		return 0, fmt.Errorf("error initializing the request: %s", err.Error())
 	}
 
-	for key, val := range service.requestHeaders {
+	for key, val := range service.RequestHeaders {
 		req.Header.Set(key, val)
 	}
 	initReq := time.Now()
@@ -58,7 +70,7 @@ func (service *HttpService) CheckLife() (time.Duration, error) {
 		return 0, fmt.Errorf("error sending the request: %s", err.Error())
 	}
 
-	if res.StatusCode == service.expectedStatusCode {
+	if res.StatusCode == service.ExpectedStatusCode {
 		return duration, nil
 	}
 
