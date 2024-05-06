@@ -43,7 +43,10 @@ func GetConfigFromYamlFile(fileName string) Config {
 
 	var config Config
 
-	yaml.Unmarshal(yamlData, &config)
+	err = yaml.Unmarshal(yamlData, &config)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	return config
 }

@@ -36,8 +36,8 @@ services:
       ping-count: 4
       most-receive: 4
 port-forward:
-  host:
-  remote-address:
-  local-port:
-  username:
-  password:
+  - host:
+    remote-address:
+    local-port:
+    username:
+    password:

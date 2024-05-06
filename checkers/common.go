@@ -6,6 +6,14 @@ import (
 	"time"
 )
 
+type State int
+
+const (
+	NoStatus State = iota
+	StatusAlive
+	StatusDead
+)
+
 type LifeChecker interface {
 	GetName() string
 	CheckLife() (time.Duration, error)

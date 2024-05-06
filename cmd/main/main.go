@@ -6,6 +6,7 @@ import (
 	"lifeChecker/config"
 	"lifeChecker/database"
 	"lifeChecker/serviceSelector"
+	"log"
 )
 
 func main() {
@@ -16,7 +17,10 @@ func main() {
 
 	db := database.GetDatabaseFromConfig(config.Database)
 
-	db.Connect()
+	err := db.Connect()
+	if err != nil {
+		log.Fatal("Error connecting to the database: ", err)
+	}
 
 	selector := serviceSelector.SelectorFromConfig(config.Services)
 
