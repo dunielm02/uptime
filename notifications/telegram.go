@@ -11,6 +11,7 @@ import (
 func aliveMessage(name string) string {
 	return fmt.Sprintf("\u2705 The Service: \"%s\" is Up\u2705", name)
 }
+
 func deadMessage(name string) string {
 	return fmt.Sprintf("\u203c\ufe0f The Service \"%s\" is Down \u203c\ufe0f", name)
 }
