@@ -22,7 +22,7 @@ func main() {
 		log.Fatal("Error connecting to the database: ", err)
 	}
 
-	selector := serviceSelector.SelectorFromConfig(config.Services)
+	selector := serviceSelector.SelectorFromConfig(config)
 
 	selector.RunChecking(context.Background(), db)
 }

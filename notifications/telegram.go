@@ -3,11 +3,20 @@ package notifications
 import (
 	"encoding/json"
 	"fmt"
+	"lifeChecker/config"
+
+	"github.com/mitchellh/mapstructure"
 )
 
 type TelegramBot struct {
-	token  string
-	chatId string
+	Token  string `mapstructure:"token"`
+	ChatId string `mapstructure:"chat-id"`
+}
+
+func getTelegramBot(cfg config.NotificationChannelsConfig) (*TelegramBot, error) {
+	var ret TelegramBot
+	err := mapstructure.Decode(cfg.Spec, &ret)
+	return &ret, err
 }
 
 func (bot *TelegramBot) AliveNotification(name string) error {
@@ -19,7 +28,7 @@ func (bot *TelegramBot) DeadNotification(name string) error {
 }
 
 func (bot *TelegramBot) url() string {
-	return fmt.Sprintf("https://api.telegram.org/bot%s/getUpdates", bot.token)
+	return fmt.Sprintf("https://api.telegram.org/bot%s/getUpdates", bot.Token)
 }
 
 func telegramResponseHandler(respData []byte) error {
@@ -37,7 +46,7 @@ func telegramResponseHandler(respData []byte) error {
 
 func (bot *TelegramBot) sendNotification(message string) error {
 	body := map[string]string{
-		"chat_id": bot.chatId,
+		"chat_id": bot.ChatId,
 		"text":    message,
 	}
 

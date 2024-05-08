@@ -41,3 +41,9 @@ port-forward:
     local-port:
     username:
     password:
+notification-channels:
+  - name: telegram_notification
+    type: telegram
+    spec:
+      token:
+      chat-id:

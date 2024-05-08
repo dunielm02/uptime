@@ -1,9 +1,20 @@
 package notifications
 
-import "fmt"
+import (
+	"fmt"
+	"lifeChecker/config"
+
+	"github.com/mitchellh/mapstructure"
+)
 
 type DiscordBot struct {
-	webHookUrl string
+	WebHookUrl string `mapstructure:"webhook"`
+}
+
+func getDiscordBot(cfg config.NotificationChannelsConfig) (*DiscordBot, error) {
+	var ret DiscordBot
+	err := mapstructure.Decode(cfg.Spec, &ret)
+	return &ret, err
 }
 
 func (bot *DiscordBot) AliveNotification(name string) error {
@@ -28,5 +39,5 @@ func (bot *DiscordBot) sendNotification(message string) error {
 		"content": message,
 	}
 
-	return sendToWebHook(bot.webHookUrl, body, discordResponseHandler)
+	return sendToWebHook(bot.WebHookUrl, body, discordResponseHandler)
 }

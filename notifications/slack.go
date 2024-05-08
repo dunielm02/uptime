@@ -2,10 +2,19 @@ package notifications
 
 import (
 	"fmt"
+	"lifeChecker/config"
+
+	"github.com/mitchellh/mapstructure"
 )
 
 type SlackBot struct {
-	webHookUrl string
+	WebHookUrl string `mapstructure:"webhook"`
+}
+
+func getSlackBot(cfg config.NotificationChannelsConfig) (*SlackBot, error) {
+	var ret SlackBot
+	err := mapstructure.Decode(cfg.Spec, &ret)
+	return &ret, err
 }
 
 func (bot *SlackBot) AliveNotification(name string) error {
@@ -29,5 +38,5 @@ func (bot *SlackBot) sendNotification(message string) error {
 		"text": message,
 	}
 
-	return sendToWebHook(bot.webHookUrl, body, slackResponseHandler)
+	return sendToWebHook(bot.WebHookUrl, body, slackResponseHandler)
 }

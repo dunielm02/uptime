@@ -29,10 +29,17 @@ type PortForwardConfig struct {
 	Password      string `yaml:"password"`
 }
 
+type NotificationChannelsConfig struct {
+	Name string `yaml:"name"`
+	Type string `yaml:"type"`
+	Spec any
+}
+
 type Config struct {
-	Database     DatabaseConfig      `yaml:"database"`
-	Services     []ServiceConfig     `yaml:"services"`
-	PortForwards []PortForwardConfig `yaml:"port-forward"`
+	Database             DatabaseConfig               `yaml:"database"`
+	Services             []ServiceConfig              `yaml:"services"`
+	PortForwards         []PortForwardConfig          `yaml:"port-forward"`
+	NotificationChannels []NotificationChannelsConfig `yaml:"notification-channels"`
 }
 
 func GetConfigFromYamlFile(fileName string) Config {

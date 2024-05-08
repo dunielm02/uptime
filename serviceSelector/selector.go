@@ -6,20 +6,32 @@ import (
 	"lifeChecker/checkers"
 	"lifeChecker/config"
 	"lifeChecker/database"
+	"lifeChecker/notifications"
 	"lifeChecker/serviceSelector/queue"
+	"log"
 	"sync"
 	"time"
 )
 
 type Selector struct {
-	mu   *sync.RWMutex
-	list *queue.Queue
+	mu     *sync.RWMutex
+	alerts sync.Map
+	list   *queue.Queue
 }
 
-func SelectorFromConfig(cfg []config.ServiceConfig) *Selector {
+func SelectorFromConfig(cfg config.Config) *Selector {
 	selector := NewSelector()
 
-	for _, i := range cfg {
+	for _, i := range cfg.NotificationChannels {
+		val, err := notifications.GetNotificationChannelFromConfig(i)
+		if err != nil {
+			log.Printf("there was an error adding a notification channel: %s", err)
+			continue
+		}
+		selector.alerts.Store(i.Name, val)
+	}
+
+	for _, i := range cfg.Services {
 		selector.Insert(checkers.GetFromConfig(i))
 	}
 
