@@ -90,24 +90,47 @@ func (s *Selector) RunChecking(ctx context.Context, db database.DB) {
 		service := s.NextItem()
 
 		go func(serv checkers.LifeChecker) {
-			alive := true
+			alive := checkers.StatusAlive
 			requestDuration, err := serv.CheckLife()
 
 			if err != nil {
 				if !serv.IsInverted() {
-					alive = false
+					alive = checkers.StatusDead
 				}
+			}
+
+			if alive != serv.GetState() {
+				s.SendNotifications(serv, alive)
 			}
 
 			toSend := database.TimeSerie{
 				Name:        serv.GetName(),
 				RequestTime: requestDuration,
-				Alive:       alive,
+				Alive:       alive == checkers.StatusAlive,
 			}
 
 			lifeResult <- toSend
 
 			s.Insert(serv)
 		}(service)
+	}
+}
+
+func (s *Selector) SendNotifications(service checkers.LifeChecker, alive checkers.State) {
+	channels := service.GetNotificationChannelsNames()
+
+	for _, chanName := range channels {
+		c, ok := s.alerts.Load(chanName)
+		if !ok {
+			log.Printf("The notification channel: \"%s\" does not exist.\n", chanName)
+		}
+
+		channel := c.(notifications.NotificationChannel)
+
+		if alive == checkers.StatusAlive {
+			channel.AliveNotification(service.GetName())
+		} else {
+			channel.DeadNotification(service.GetName())
+		}
 	}
 }
