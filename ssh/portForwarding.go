@@ -2,13 +2,26 @@ package ssh
 
 import (
 	"io"
+	"lifeChecker/config"
 	"log"
 	"net"
 )
 
 type PortForward struct {
-	shhProps   SshConnectionProps
+	shhProps   sshConnectionProps
 	localAddrs string
+}
+
+func GetProtFrowardFromConfig(cfg config.PortForwardConfig) PortForward {
+	return PortForward{
+		localAddrs: cfg.LocalAddress,
+		shhProps: sshConnectionProps{
+			username:         cfg.Username,
+			password:         cfg.Password,
+			serverAddrString: cfg.ServerAddress,
+			remoteAddrString: cfg.RemoteAddress,
+		},
+	}
 }
 
 func (p *PortForward) ForwardPort() {

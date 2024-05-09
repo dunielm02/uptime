@@ -7,14 +7,14 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-type SshConnectionProps struct {
+type sshConnectionProps struct {
 	username         string
 	password         string
 	serverAddrString string
 	remoteAddrString string
 }
 
-func (c *SshConnectionProps) NewConnection() (net.Conn, error) {
+func (c *sshConnectionProps) NewConnection() (net.Conn, error) {
 	config := &ssh.ClientConfig{
 		User: c.username,
 		Auth: []ssh.AuthMethod{
