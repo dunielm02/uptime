@@ -18,6 +18,7 @@ type PingService struct {
 	waitingTime          time.Duration
 	inverted             bool
 	notificationChannels []string
+	state                State
 	PingServiceSpec
 }
 
@@ -42,6 +43,7 @@ func getPingServiceFromConfig(cfg config.ServiceConfig) *PingService {
 		timeout:              cfg.Timeout,
 		waitingTime:          time.Duration(cfg.WaitingTime) * time.Second,
 		inverted:             cfg.Inverted,
+		state:                NoStatus,
 		notificationChannels: cfg.NotificationChannels,
 		PingServiceSpec:      spec,
 	}
@@ -67,6 +69,10 @@ func (service *PingService) CheckLife() (time.Duration, error) {
 	}
 
 	return pinger.Statistics().AvgRtt, nil
+}
+
+func (service *PingService) GetState() State {
+	return service.state
 }
 
 func (service *PingService) GetNotificationChannelsNames() []string {

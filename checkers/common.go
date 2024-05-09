@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-type State int
+type State byte
 
 const (
 	NoStatus State = iota
@@ -20,6 +20,7 @@ type LifeChecker interface {
 	IsInverted() bool
 	GetQueueTime() time.Duration
 	GetNotificationChannelsNames() []string
+	GetState() State
 }
 
 func GetFromConfig(cfg config.ServiceConfig) LifeChecker {

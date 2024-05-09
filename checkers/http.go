@@ -19,6 +19,7 @@ type HttpService struct {
 	inverted             bool
 	waitingTime          time.Duration
 	notificationChannels []string
+	state                State
 	HttpServiceSpec
 }
 
@@ -51,6 +52,7 @@ func getHttpServiceFromConfig(cfg config.ServiceConfig) *HttpService {
 		waitingTime:          time.Duration(cfg.WaitingTime) * time.Second,
 		client:               client,
 		inverted:             cfg.Inverted,
+		state:                NoStatus,
 		notificationChannels: cfg.NotificationChannels,
 		HttpServiceSpec:      spec,
 	}
@@ -81,6 +83,10 @@ func (service *HttpService) CheckLife() (time.Duration, error) {
 
 func (service *HttpService) GetNotificationChannelsNames() []string {
 	return service.notificationChannels
+}
+
+func (service *HttpService) GetState() State {
+	return service.state
 }
 
 func (service *HttpService) GetName() string {

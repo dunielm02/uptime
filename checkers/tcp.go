@@ -16,6 +16,7 @@ type TcpService struct {
 	waitingTime          time.Duration
 	inverted             bool
 	notificationChannels []string
+	state                State
 	TcpServiceSpec
 }
 
@@ -41,6 +42,7 @@ func getTcpServiceFromConfig(cfg config.ServiceConfig) *TcpService {
 		waitingTime:          time.Duration(cfg.WaitingTime) * time.Second,
 		dialer:               dialer,
 		inverted:             cfg.Inverted,
+		state:                NoStatus,
 		notificationChannels: cfg.NotificationChannels,
 		TcpServiceSpec:       spec,
 	}
@@ -56,6 +58,10 @@ func (service *TcpService) CheckLife() (time.Duration, error) {
 	defer conn.Close()
 
 	return duration, err
+}
+
+func (service *TcpService) GetState() State {
+	return service.state
 }
 
 func (service *TcpService) GetNotificationChannelsNames() []string {

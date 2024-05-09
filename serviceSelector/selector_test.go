@@ -18,17 +18,16 @@ type ctxKey string
 type mock_checkLifeService struct {
 	name     string
 	inverted bool
+	status   checkers.State
 	err      error
 }
 
-func (s *mock_checkLifeService) GetName() string {
-	return s.name
-}
-
+func (s *mock_checkLifeService) GetName() string                        { return s.name }
 func (s *mock_checkLifeService) CheckLife() (time.Duration, error)      { return time.Duration(100), s.err }
 func (s *mock_checkLifeService) IsInverted() bool                       { return s.inverted }
 func (s *mock_checkLifeService) GetQueueTime() time.Duration            { return time.Duration(1) * time.Second }
 func (s *mock_checkLifeService) GetNotificationChannelsNames() []string { return []string{} }
+func (s *mock_checkLifeService) GetState() checkers.State               { return s.status }
 
 type testCase struct {
 	service checkers.LifeChecker
