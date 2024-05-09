@@ -14,10 +14,11 @@ import (
 // HttpService represents a service that we will prove
 // is it is alive via http(s)
 type HttpService struct {
-	name        string
-	client      *http.Client
-	inverted    bool
-	waitingTime time.Duration
+	name                 string
+	client               *http.Client
+	inverted             bool
+	waitingTime          time.Duration
+	notificationChannels []string
 	HttpServiceSpec
 }
 
@@ -46,11 +47,12 @@ func getHttpServiceFromConfig(cfg config.ServiceConfig) *HttpService {
 	}
 
 	return &HttpService{
-		name:            cfg.Name,
-		HttpServiceSpec: spec,
-		inverted:        cfg.Inverted,
-		waitingTime:     time.Duration(cfg.WaitingTime) * time.Second,
-		client:          client,
+		name:                 cfg.Name,
+		waitingTime:          time.Duration(cfg.WaitingTime) * time.Second,
+		client:               client,
+		inverted:             cfg.Inverted,
+		notificationChannels: cfg.NotificationChannels,
+		HttpServiceSpec:      spec,
 	}
 }
 
@@ -75,6 +77,10 @@ func (service *HttpService) CheckLife() (time.Duration, error) {
 	}
 
 	return 0, fmt.Errorf("unexpected status code: %d", res.StatusCode)
+}
+
+func (service *HttpService) GetNotificationChannelsNames() []string {
+	return service.notificationChannels
 }
 
 func (service *HttpService) GetName() string {

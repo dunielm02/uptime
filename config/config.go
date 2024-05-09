@@ -13,12 +13,13 @@ type DatabaseConfig struct {
 }
 
 type ServiceConfig struct {
-	Type        string `yaml:"type"`
-	Name        string `yaml:"name"`
-	WaitingTime int    `yaml:"waiting-time"`
-	Timeout     int    `yaml:"timeout"`
-	Inverted    bool   `yaml:"inverted"`
-	Spec        any    `yaml:"spec"`
+	Type                 string   `yaml:"type"`
+	Name                 string   `yaml:"name"`
+	WaitingTime          int      `yaml:"waiting-time"`
+	Timeout              int      `yaml:"timeout"`
+	Inverted             bool     `yaml:"inverted"`
+	NotificationChannels []string `yaml:"notification-channels"`
+	Spec                 any      `yaml:"spec"`
 }
 
 type PortForwardConfig struct {

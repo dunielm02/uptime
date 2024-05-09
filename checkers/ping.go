@@ -13,10 +13,11 @@ import (
 //ADD IPV6 PING
 
 type PingService struct {
-	name        string
-	timeout     int
-	waitingTime time.Duration
-	inverted    bool
+	name                 string
+	timeout              int
+	waitingTime          time.Duration
+	inverted             bool
+	notificationChannels []string
 	PingServiceSpec
 }
 
@@ -37,11 +38,12 @@ func getPingServiceFromConfig(cfg config.ServiceConfig) *PingService {
 	fmt.Println(spec)
 
 	return &PingService{
-		name:            cfg.Name,
-		timeout:         cfg.Timeout,
-		waitingTime:     time.Duration(cfg.WaitingTime) * time.Second,
-		inverted:        cfg.Inverted,
-		PingServiceSpec: spec,
+		name:                 cfg.Name,
+		timeout:              cfg.Timeout,
+		waitingTime:          time.Duration(cfg.WaitingTime) * time.Second,
+		inverted:             cfg.Inverted,
+		notificationChannels: cfg.NotificationChannels,
+		PingServiceSpec:      spec,
 	}
 }
 
@@ -65,6 +67,10 @@ func (service *PingService) CheckLife() (time.Duration, error) {
 	}
 
 	return pinger.Statistics().AvgRtt, nil
+}
+
+func (service *PingService) GetNotificationChannelsNames() []string {
+	return service.notificationChannels
 }
 
 func (service *PingService) GetQueueTime() time.Duration {

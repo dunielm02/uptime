@@ -15,13 +15,11 @@ type mock_checkLifeService struct {
 	name string
 }
 
-func (s *mock_checkLifeService) GetName() string {
-	return s.name
-}
-
-func (s *mock_checkLifeService) CheckLife() (time.Duration, error) { return time.Duration(0), nil }
-func (s *mock_checkLifeService) IsInverted() bool                  { return true }
-func (s *mock_checkLifeService) GetQueueTime() time.Duration       { return time.Duration(0) }
+func (s *mock_checkLifeService) GetName() string                        { return s.name }
+func (s *mock_checkLifeService) CheckLife() (time.Duration, error)      { return time.Duration(0), nil }
+func (s *mock_checkLifeService) IsInverted() bool                       { return true }
+func (s *mock_checkLifeService) GetQueueTime() time.Duration            { return time.Duration(0) }
+func (s *mock_checkLifeService) GetNotificationChannelsNames() []string { return []string{} }
 
 func TestQueue(t *testing.T) {
 	t.Run("testing that the Queues is Ordered", func(t *testing.T) {

@@ -11,10 +11,11 @@ import (
 )
 
 type TcpService struct {
-	name        string
-	dialer      net.Dialer
-	waitingTime time.Duration
-	inverted    bool
+	name                 string
+	dialer               net.Dialer
+	waitingTime          time.Duration
+	inverted             bool
+	notificationChannels []string
 	TcpServiceSpec
 }
 
@@ -36,11 +37,12 @@ func getTcpServiceFromConfig(cfg config.ServiceConfig) *TcpService {
 	}
 
 	return &TcpService{
-		name:           cfg.Name,
-		waitingTime:    time.Duration(cfg.WaitingTime) * time.Second,
-		dialer:         dialer,
-		inverted:       cfg.Inverted,
-		TcpServiceSpec: spec,
+		name:                 cfg.Name,
+		waitingTime:          time.Duration(cfg.WaitingTime) * time.Second,
+		dialer:               dialer,
+		inverted:             cfg.Inverted,
+		notificationChannels: cfg.NotificationChannels,
+		TcpServiceSpec:       spec,
 	}
 }
 
@@ -54,6 +56,10 @@ func (service *TcpService) CheckLife() (time.Duration, error) {
 	defer conn.Close()
 
 	return duration, err
+}
+
+func (service *TcpService) GetNotificationChannelsNames() []string {
+	return service.notificationChannels
 }
 
 func (service *TcpService) GetQueueTime() time.Duration {

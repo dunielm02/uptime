@@ -12,6 +12,7 @@ services:
     timeout: 30
     waiting-time: 60
     inverted: false
+    notification-channels: ["telegram"]
     spec:
       url: google.com
       method: POST
@@ -24,6 +25,7 @@ services:
     type: tcp
     timeout: 30
     inverted: false
+    notification-channels: ["telegram"]
     spec:
       host: google.com
       port: 3000
@@ -31,6 +33,7 @@ services:
     type: ping
     timeout: 30
     inverted: false
+    notification-channels: ["telegram"]
     spec:
       host: www.google.com
       ping-count: 4
@@ -42,7 +45,7 @@ port-forward:
     username:
     password:
 notification-channels:
-  - name: telegram_notification
+  - name: telegram
     type: telegram
     spec:
       token:

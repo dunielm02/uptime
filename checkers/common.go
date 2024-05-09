@@ -19,6 +19,7 @@ type LifeChecker interface {
 	CheckLife() (time.Duration, error)
 	IsInverted() bool
 	GetQueueTime() time.Duration
+	GetNotificationChannelsNames() []string
 }
 
 func GetFromConfig(cfg config.ServiceConfig) LifeChecker {
