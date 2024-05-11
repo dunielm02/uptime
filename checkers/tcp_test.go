@@ -56,7 +56,7 @@ func setUpTcpListener() {
 	for {
 		conn, err := l.Accept()
 		if err != nil {
-			log.Fatalf("error Accepting the incoming connection")
+			log.Fatalf("error accepting the incoming connection")
 		}
 
 		go func() {

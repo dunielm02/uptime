@@ -5,6 +5,7 @@ import (
 	"errors"
 	"lifeChecker/checkers"
 	"lifeChecker/database"
+	"lifeChecker/tests/mocks"
 	"strconv"
 	"sync"
 	"testing"
@@ -14,20 +15,6 @@ import (
 )
 
 type ctxKey string
-
-type mock_checkLifeService struct {
-	name     string
-	inverted bool
-	status   checkers.State
-	err      error
-}
-
-func (s *mock_checkLifeService) GetName() string                        { return s.name }
-func (s *mock_checkLifeService) CheckLife() (time.Duration, error)      { return time.Duration(100), s.err }
-func (s *mock_checkLifeService) IsInverted() bool                       { return s.inverted }
-func (s *mock_checkLifeService) GetQueueTime() time.Duration            { return time.Duration(1) * time.Second }
-func (s *mock_checkLifeService) GetNotificationChannelsNames() []string { return []string{} }
-func (s *mock_checkLifeService) GetState() checkers.State               { return s.status }
 
 type testCase struct {
 	service checkers.LifeChecker
@@ -56,9 +43,11 @@ loop:
 
 	return c.Err()
 }
+
 func (db *dbMock) Connect() error {
 	return nil
 }
+
 func (db *dbMock) CloseConnection() error {
 	return nil
 }
@@ -67,13 +56,12 @@ func TestSelector(t *testing.T) {
 	t.Run("Concurrency Supporting", func(t *testing.T) {
 		selector := NewSelector()
 		wg := sync.WaitGroup{}
-
 		for i := range 10 {
 			wg.Add(1)
 			go func(value int) {
 				defer wg.Done()
-				selector.Insert(&mock_checkLifeService{
-					name: strconv.Itoa(value),
+				selector.Insert(&mocks.Mock_checkLifeService{
+					Name: strconv.Itoa(value),
 				})
 			}(i)
 		}
@@ -95,10 +83,10 @@ func TestSelector(t *testing.T) {
 func TestRunningSelector(t *testing.T) {
 	var testCases = map[string]testCase{
 		"Successful Check Life Process": {
-			service: &mock_checkLifeService{
-				name:     "Successful Check Life Process",
-				inverted: false,
-				err:      nil,
+			service: &mocks.Mock_checkLifeService{
+				Name:     "Successful Check Life Process",
+				Inverted: false,
+				Err:      nil,
 			},
 			result: database.TimeSerie{
 				Name:        "Successful Check Life Process",
@@ -107,10 +95,10 @@ func TestRunningSelector(t *testing.T) {
 			},
 		},
 		"Successful Inverted Check Life Process": {
-			service: &mock_checkLifeService{
-				name:     "Successful Inverted Check Life Process",
-				inverted: true,
-				err:      errors.New("Something went wrong"),
+			service: &mocks.Mock_checkLifeService{
+				Name:     "Successful Inverted Check Life Process",
+				Inverted: true,
+				Err:      errors.New("Something went wrong"),
 			},
 			result: database.TimeSerie{
 				Name:        "Successful Inverted Check Life Process",
@@ -119,10 +107,10 @@ func TestRunningSelector(t *testing.T) {
 			},
 		},
 		"Unsuccessful Life Check": {
-			service: &mock_checkLifeService{
-				name:     "Unsuccessful Life Check",
-				inverted: false,
-				err:      errors.New("Unsuccessful Life Check"),
+			service: &mocks.Mock_checkLifeService{
+				Name:     "Unsuccessful Life Check",
+				Inverted: false,
+				Err:      errors.New("Unsuccessful Life Check"),
 			},
 			result: database.TimeSerie{
 				Name:        "Unsuccessful Life Check",
