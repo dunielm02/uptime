@@ -25,7 +25,7 @@ type PingService struct {
 type PingServiceSpec struct {
 	Host        string `mapstructure:"host"`
 	PingCount   int    `mapstructure:"ping-count"`
-	MostReceive int    `mapstructure:"most-receive"`
+	MustReceive int    `mapstructure:"must-receive"`
 }
 
 func getPingServiceFromConfig(cfg config.ServiceConfig) *PingService {
@@ -35,8 +35,6 @@ func getPingServiceFromConfig(cfg config.ServiceConfig) *PingService {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	fmt.Println(spec)
 
 	return &PingService{
 		name:                 cfg.Name,
@@ -64,7 +62,7 @@ func (service *PingService) CheckLife() (time.Duration, error) {
 		return 0, fmt.Errorf("error running the pinger: %v", err)
 	}
 
-	if pinger.Statistics().PacketsRecv < service.MostReceive {
+	if pinger.Statistics().PacketsRecv < service.MustReceive {
 		return 0, fmt.Errorf("only %d packets were received from %d", service.PingCount, pinger.Statistics().PacketsRecv)
 	}
 

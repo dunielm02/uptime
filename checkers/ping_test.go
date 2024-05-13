@@ -14,7 +14,7 @@ func TestPingCheckLife(t *testing.T) {
 			PingServiceSpec: PingServiceSpec{
 				Host:        "127.0.0.1",
 				PingCount:   4,
-				MostReceive: 4,
+				MustReceive: 4,
 			},
 			timeout: 5,
 		}
@@ -29,7 +29,7 @@ func TestPingCheckLife(t *testing.T) {
 			PingServiceSpec: PingServiceSpec{
 				Host:        "192.168.255.255",
 				PingCount:   4,
-				MostReceive: 4,
+				MustReceive: 4,
 			},
 			timeout: 5,
 		}

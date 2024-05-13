@@ -34,14 +34,10 @@ type HttpServiceSpec struct {
 func getHttpServiceFromConfig(cfg config.ServiceConfig) *HttpService {
 	var spec HttpServiceSpec
 
-	fmt.Println(cfg.Spec)
-
 	err := mapstructure.Decode(cfg.Spec, &spec)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	fmt.Println(spec)
 
 	client := &http.Client{
 		Timeout: time.Duration(cfg.Timeout) * time.Second,

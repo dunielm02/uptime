@@ -24,20 +24,22 @@ services:
   - name: My Tcp Service
     type: tcp
     timeout: 30
+    waiting-time: 60
     inverted: false
     notification-channels: ["telegram"]
     spec:
-      host: google.com
+      host: www.google.com
       port: 3000
   - name: My Ping Service
     type: ping
     timeout: 30
+    waiting-time: 60
     inverted: false
     notification-channels: ["telegram"]
     spec:
       host: www.google.com
       ping-count: 4
-      most-receive: 4
+      must-receive: 4
 port-forward:
   - server-address:
     remote-address:
