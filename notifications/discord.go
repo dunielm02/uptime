@@ -26,10 +26,9 @@ func (bot *DiscordBot) DeadNotification(name string) error {
 }
 
 func discordResponseHandler(resp []byte) error {
-	fmt.Println(string(resp))
-	// if string(resp) != "ok" {
-	// 	return fmt.Errorf("error sending Slack message: %s", string(resp))
-	// }
+	if string(resp) != "" {
+		return fmt.Errorf("error sending Discord message: %s", string(resp))
+	}
 
 	return nil
 }

@@ -58,5 +58,5 @@ func StartHttpServerMock() {
 		}
 	})
 
-	http.ListenAndServe("localhost:3200", mux)
+	http.ListenAndServe(":3200", mux)
 }
