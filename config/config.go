@@ -25,7 +25,7 @@ type ServiceConfig struct {
 type PortForwardConfig struct {
 	ServerAddress string `yaml:"server-address"`
 	RemoteAddress string `yaml:"remote-address"`
-	LocalAddress  string `yaml:"local-port"`
+	LocalAddress  string `yaml:"local-address"`
 	Username      string `yaml:"username"`
 	Password      string `yaml:"password"`
 }

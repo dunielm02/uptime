@@ -41,11 +41,11 @@ services:
       ping-count: 4
       must-receive: 4
 port-forward:
-  - server-address:
-    remote-address:
-    local-address:
-    username:
-    password:
+  - server-address: www.host.com
+    remote-address: localhost:5432
+    local-address: localhost:8000
+    username: <YourUsername>
+    password: <YourPassword>
 notification-channels:
   - name: telegram
     type: telegram

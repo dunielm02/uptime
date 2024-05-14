@@ -8,49 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var http_result = HttpService{
-	name:                 "My Http Service",
-	inverted:             false,
-	waitingTime:          60 * time.Second,
-	notificationChannels: []string{"telegram"},
-	state:                NoStatus,
-	HttpServiceSpec: HttpServiceSpec{
-		Url:    "google.com",
-		Method: "POST",
-		RequestHeaders: map[string]string{
-			"content-type":   "application/json",
-			"authentication": "bearer",
-		},
-		ExpectedStatusCode: 201,
-		RequestBody:        "{\"ID\": 4524}",
-	},
-}
-
-var tcp_result = TcpService{
-	name:                 "My Tcp Service",
-	inverted:             false,
-	notificationChannels: []string{"telegram"},
-	waitingTime:          60 * time.Second,
-	state:                NoStatus,
-	TcpServiceSpec: TcpServiceSpec{
-		HostName: "www.google.com",
-		Port:     3000,
-	},
-}
-
-var ping_result = PingService{
-	name:                 "My Ping Service",
-	inverted:             false,
-	notificationChannels: []string{"telegram"},
-	waitingTime:          60 * time.Second,
-	state:                NoStatus,
-	PingServiceSpec: PingServiceSpec{
-		Host:        "www.google.com",
-		PingCount:   4,
-		MustReceive: 4,
-	},
-}
-
 func TestGetFromConfig(t *testing.T) {
 	config := config.GetConfigFromYamlFile("../uptime-config.yml")
 
@@ -69,6 +26,23 @@ func TestGetFromConfig(t *testing.T) {
 }
 
 func compHttpResult(t *testing.T, service *HttpService) {
+	var http_result = HttpService{
+		name:                 "My Http Service",
+		inverted:             false,
+		waitingTime:          60 * time.Second,
+		notificationChannels: []string{"telegram"},
+		state:                NoStatus,
+		HttpServiceSpec: HttpServiceSpec{
+			Url:    "google.com",
+			Method: "POST",
+			RequestHeaders: map[string]string{
+				"content-type":   "application/json",
+				"authentication": "bearer",
+			},
+			ExpectedStatusCode: 201,
+			RequestBody:        "{\"ID\": 4524}",
+		},
+	}
 	assert.Equal(t, service.state, http_result.state)
 	assert.Equal(t, service.name, http_result.name)
 	assert.Equal(t, service.inverted, http_result.inverted)
@@ -88,6 +62,17 @@ func compHttpResult(t *testing.T, service *HttpService) {
 }
 
 func compTcpResult(t *testing.T, service *TcpService) {
+	var tcp_result = TcpService{
+		name:                 "My Tcp Service",
+		inverted:             false,
+		notificationChannels: []string{"telegram"},
+		waitingTime:          60 * time.Second,
+		state:                NoStatus,
+		TcpServiceSpec: TcpServiceSpec{
+			HostName: "www.google.com",
+			Port:     3000,
+		},
+	}
 	assert.Equal(t, service.state, tcp_result.state)
 	assert.Equal(t, service.name, tcp_result.name)
 	assert.Equal(t, service.inverted, tcp_result.inverted)
@@ -101,6 +86,18 @@ func compTcpResult(t *testing.T, service *TcpService) {
 }
 
 func compPingResult(t *testing.T, service *PingService) {
+	var ping_result = PingService{
+		name:                 "My Ping Service",
+		inverted:             false,
+		notificationChannels: []string{"telegram"},
+		waitingTime:          60 * time.Second,
+		state:                NoStatus,
+		PingServiceSpec: PingServiceSpec{
+			Host:        "www.google.com",
+			PingCount:   4,
+			MustReceive: 4,
+		},
+	}
 	assert.Equal(t, service.state, ping_result.state)
 	assert.Equal(t, service.name, ping_result.name)
 	assert.Equal(t, service.inverted, ping_result.inverted)
@@ -110,6 +107,6 @@ func compPingResult(t *testing.T, service *PingService) {
 	assert.Equal(t, service.MustReceive, ping_result.MustReceive)
 
 	for i := 0; i < len(service.notificationChannels); i++ {
-		assert.Equal(t, service.notificationChannels[i], tcp_result.notificationChannels[i])
+		assert.Equal(t, service.notificationChannels[i], ping_result.notificationChannels[i])
 	}
 }

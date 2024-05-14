@@ -28,7 +28,7 @@ func (bot *TelegramBot) DeadNotification(name string) error {
 }
 
 func (bot *TelegramBot) url() string {
-	return fmt.Sprintf("https://api.telegram.org/bot%s/getUpdates", bot.Token)
+	return fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", bot.Token)
 }
 
 func telegramResponseHandler(respData []byte) error {
