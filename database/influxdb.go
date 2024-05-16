@@ -74,8 +74,15 @@ func (db *Influx) WriteTimeSerie(serie TimeSerie) error {
 }
 
 func (db *Influx) Connect() error {
-	db.client = influxdb2.NewClient(db.Influxdb_url, db.Influxdb_token)
-	return nil
+	db.client = influxdb2.NewClientWithOptions(
+		db.Influxdb_url,
+		db.Influxdb_token,
+		influxdb2.DefaultOptions().SetBatchSize(20),
+	)
+
+	_, err := db.client.Health(context.Background())
+
+	return err
 }
 
 func (db *Influx) CloseConnection() error {

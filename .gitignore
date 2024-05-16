@@ -1,3 +1,5 @@
 .vscode
 compose.yml
 .env
+dockerfile
+supervisord.conf

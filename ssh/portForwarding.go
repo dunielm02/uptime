@@ -2,6 +2,7 @@ package ssh
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"lifeChecker/config"
 	"log"
@@ -30,22 +31,22 @@ func (p *PortForward) ForwardPort(ctx context.Context) {
 	if err != nil {
 		log.Fatalf("net.Listen failed: %v", err)
 	}
-
 	for {
 		select {
 		case <-ctx.Done():
 			localListener.Close()
+			return
 		default:
 			localConn, err := localListener.Accept()
 			if err != nil {
 				log.Fatalf("listen.Accept failed: %v", err)
 			}
-			go p.connectWithRemoteServer(localConn)
+			go p.connectWithRemoteServer(localConn, ctx)
 		}
 	}
 }
 
-func (p *PortForward) connectWithRemoteServer(localConn net.Conn) {
+func (p *PortForward) connectWithRemoteServer(localConn net.Conn, ctx context.Context) {
 	sshConn, err := p.shhProps.NewConnection()
 	if err != nil {
 		log.Println("Error ocurred while connecting via ssh: ", err)
@@ -54,14 +55,21 @@ func (p *PortForward) connectWithRemoteServer(localConn net.Conn) {
 	go func() {
 		_, err = io.Copy(sshConn, localConn)
 		if err != nil {
-			log.Fatalf("io.Copy failed: %v", err)
+			log.Println("io.Copy failed: ", err)
 		}
 	}()
 
 	go func() {
 		_, err = io.Copy(localConn, sshConn)
 		if err != nil {
-			log.Fatalf("io.Copy failed: %v", err)
+			log.Println("io.Copy failed: ", err)
 		}
+	}()
+
+	go func() {
+		<-ctx.Done()
+		localConn.Close()
+		sshConn.Close()
+		fmt.Println("canceled")
 	}()
 }

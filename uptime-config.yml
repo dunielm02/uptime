@@ -14,7 +14,7 @@ services:
     inverted: false
     notification-channels: ["telegram"]
     spec:
-      url: google.com
+      url: localhost:8000
       method: POST
       headers:
         content-type: application/json
