@@ -30,3 +30,25 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/uptime-testing-image:latest
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/uptime-testing-image:latest
           cache-to: type=inline
+
+  run-tests:
+    runs-on: ubuntu-latest
+    needs: build_image
+    services:
+      testing-service:
+        image: ${{ secrets.DOCKERHUB_USERNAME }}/uptime-testing-image:latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22.2'
+
+      - name: Install Dependecies
+        run: |
+          go mod download
+
+      - name: Testing
+        run: go test -race ./...
