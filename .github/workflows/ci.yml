@@ -36,7 +36,7 @@ jobs:
     needs: build_image
     services:
       testing-service:
-        image: ${{ secrets.DOCKERHUB_USERNAME }}/uptime-testing-image:latest
+        image: dunielm02/uptime-testing-image:latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
