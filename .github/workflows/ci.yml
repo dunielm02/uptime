@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+env:
+  TELEGRAM_BOT: ${{ secrets.TELEGRAM_BOT }}
+
 jobs:
   build_image:
     runs-on: ubuntu-latest
@@ -53,4 +56,4 @@ jobs:
           go mod download
 
       - name: Testing
-        run: go test -race ./...
+        run: sudo go test -race ./...
