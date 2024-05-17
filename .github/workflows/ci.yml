@@ -37,6 +37,8 @@ jobs:
     services:
       testing-service:
         image: dunielm02/uptime-testing-image:latest
+        ports:
+          - "3030:22"
     steps:
       - name: Checkout
         uses: actions/checkout@v4

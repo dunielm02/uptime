@@ -33,7 +33,7 @@ func compHttpResult(t *testing.T, service *HttpService) {
 		notificationChannels: []string{"telegram"},
 		state:                NoStatus,
 		HttpServiceSpec: HttpServiceSpec{
-			Url:    "google.com",
+			Url:    "http://www.google.com",
 			Method: "POST",
 			RequestHeaders: map[string]string{
 				"content-type":   "application/json",
