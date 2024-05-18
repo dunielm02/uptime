@@ -52,5 +52,8 @@ jobs:
         run: |
           go mod download
 
+      - name: Adding permissions to send ip4:icmp packets
+        run: sudo sysctl -w net.ipv4.ping_group_range="0 2147483647"
+
       - name: Testing
-        run: sudo env "TELGRAM_BOT=$${{ secrets.TELEGRAM_BOT }}" go test -race ./...
+        run: go test -race ./...
