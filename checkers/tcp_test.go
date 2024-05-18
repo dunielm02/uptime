@@ -15,7 +15,7 @@ func TestTcpCheckLife(t *testing.T) {
 		service := TcpService{
 			TcpServiceSpec: TcpServiceSpec{
 				HostName: "localhost",
-				Port:     8000,
+				Port:     8001,
 			},
 		}
 
@@ -28,7 +28,7 @@ func TestTcpCheckLife(t *testing.T) {
 		service := TcpService{
 			TcpServiceSpec: TcpServiceSpec{
 				HostName: "localhost",
-				Port:     8001,
+				Port:     8002,
 			},
 		}
 
@@ -40,7 +40,7 @@ func TestTcpCheckLife(t *testing.T) {
 }
 
 func setUpTcpListener() {
-	l, err := net.Listen("tcp", ":8000")
+	l, err := net.Listen("tcp", ":8001")
 
 	defer func() {
 		err := l.Close()
