@@ -1,6 +1,7 @@
 package notifications
 
 import (
+	"fmt"
 	"lifeChecker/tests/mocks"
 	"os"
 	"testing"
@@ -27,6 +28,8 @@ func testTelegram(t *testing.T) {
 		Token:  os.Getenv("TELEGRAM_BOT"),
 		ChatId: "827317315",
 	}
+
+	fmt.Println(bot.url())
 
 	err := bot.AliveNotification("Testing")
 	assert.Nil(t, err)
