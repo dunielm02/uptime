@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"lifeChecker/config"
 	"log"
+	"os"
 	"time"
 
 	"github.com/mitchellh/mapstructure"
@@ -53,7 +54,9 @@ func (service *PingService) CheckLife() (time.Duration, error) {
 		return 0, fmt.Errorf("error creating the pinger: %v", err)
 	}
 
-	pinger.SetPrivileged(true)
+	if os.Getenv("ENVIRONMENT_OS") == "windows" {
+		pinger.SetPrivileged(true)
+	}
 	pinger.Timeout = time.Duration(service.timeout) * time.Second
 	pinger.Count = service.PingCount
 
