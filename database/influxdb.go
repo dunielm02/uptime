@@ -2,12 +2,14 @@ package database
 
 import (
 	"context"
+	"fmt"
 	"lifeChecker/config"
 	"log"
 	"time"
 
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/api/write"
+	"github.com/influxdata/influxdb-client-go/v2/domain"
 	"github.com/mitchellh/mapstructure"
 )
 
@@ -53,22 +55,22 @@ func (db *Influx) WriteTimeSerieFromChannel(ctx context.Context, data <-chan Tim
 }
 
 func (db *Influx) WriteTimeSerie(serie TimeSerie) error {
-	writeAPI := db.client.WriteAPIBlocking(db.Influxdb_org, db.Influxdb_bucket)
+	writeAPI := db.client.WriteAPI(db.Influxdb_org, db.Influxdb_bucket)
 
 	tags := map[string]string{
 		"name": serie.Name,
 	}
 
 	fields := map[string]interface{}{
-		"time":  serie.RequestTime / time.Millisecond,
-		"alive": serie.Alive,
+		"request-time": int64(serie.RequestTime / time.Millisecond),
+		"alive":        serie.Alive,
 	}
 
 	point := write.NewPoint(db.Influxdb_measurement, tags, fields, time.Now())
 
-	if err := writeAPI.WritePoint(context.Background(), point); err != nil {
-		return err
-	}
+	writeAPI.WritePoint(point)
+
+	writeAPI.Flush()
 
 	return nil
 }
@@ -77,12 +79,20 @@ func (db *Influx) Connect() error {
 	db.client = influxdb2.NewClientWithOptions(
 		db.Influxdb_url,
 		db.Influxdb_token,
-		influxdb2.DefaultOptions().SetBatchSize(20),
+		influxdb2.DefaultOptions(),
 	)
 
-	_, err := db.client.Health(context.Background())
+	health, err := db.client.Health(context.Background())
 
-	return err
+	if err != nil {
+		return err
+	}
+
+	if health.Status != domain.HealthCheckStatusPass {
+		return fmt.Errorf("database unhealthy, health status: %v", health.Status)
+	}
+
+	return nil
 }
 
 func (db *Influx) CloseConnection() error {

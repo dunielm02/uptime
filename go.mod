@@ -4,6 +4,7 @@ go 1.22.1
 
 require (
 	github.com/influxdata/influxdb-client-go/v2 v2.13.0
+	github.com/joho/godotenv v1.5.1
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/prometheus-community/pro-bing v0.4.0
 	github.com/stretchr/testify v1.9.0
