@@ -62,7 +62,7 @@ func (db *Influx) WriteTimeSerie(serie TimeSerie) error {
 	}
 
 	fields := map[string]interface{}{
-		"request-time": int64(serie.RequestTime / time.Millisecond),
+		"request-time": serie.RequestTime / time.Millisecond,
 		"alive":        serie.Alive,
 	}
 

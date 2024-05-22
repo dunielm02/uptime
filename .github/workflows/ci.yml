@@ -41,6 +41,17 @@ jobs:
         image: dunielm02/uptime-testing-image:latest
         ports:
           - "3030:22"
+      influxdb: 
+        image: "influxdb:2.7"
+        ports:
+          - "8086:8086"
+        env:
+          DOCKER_INFLUXDB_INIT_MODE: setup
+          DOCKER_INFLUXDB_INIT_USERNAME: dunielm02
+          DOCKER_INFLUXDB_INIT_PASSWORD: dunielm02
+          DOCKER_INFLUXDB_INIT_ORG: myOrg
+          DOCKER_INFLUXDB_INIT_BUCKET: firstBucket
+          DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: DA8osWZB208kHI7CpQVn1Fz0E_gXsrTfk2oz0_U0XkfKNUwQ224cShAz2_nh_j84TgrvD5Y8mw8X1Ag4uHG7mg==
     steps:
       - name: Checkout
         uses: actions/checkout@v4

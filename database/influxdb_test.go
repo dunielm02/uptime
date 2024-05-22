@@ -25,6 +25,10 @@ func testConnectToInfluxDB(t *testing.T) {
 	err := db.Connect()
 
 	assert.Nil(t, err)
+
+	err = db.CloseConnection()
+
+	assert.Nil(t, err)
 }
 
 func testWriteTimeSerie(t *testing.T) {
@@ -45,23 +49,33 @@ func testWriteTimeSerie(t *testing.T) {
 		db.WriteTimeSerie(timeSerie)
 	}
 
-	db.client.WriteAPI(db.Influxdb_org, db.Influxdb_bucket).Flush()
+	doQuery(t, db, "request-time")
+	doQuery(t, db, "alive")
 
+}
+
+func doQuery(t *testing.T, db Influx, field string) {
 	queryApi := db.client.QueryAPI(db.Influxdb_org)
 
 	res, err := queryApi.Query(context.Background(), fmt.Sprintf(`
 		from(bucket: "%s")
 			|> range(start: -10m)
-	`, db.Influxdb_bucket))
+			|> filter(fn: (r) => r._field=="%s")
+	`, db.Influxdb_bucket, field))
 
 	if err != nil {
 		t.Error(err)
 	}
-
+	var cont = 0
 	for res.Next() {
+		cont++
 		result := res.Record()
-
 		fmt.Printf("%s = %v\n", result.Field(), result.Value())
+		assert.Equal(t, field, result.Field())
+	}
+	fmt.Println(cont)
+	if cont < 10 {
+		t.Errorf("only %d were found", cont)
 	}
 }
 
