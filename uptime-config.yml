@@ -12,13 +12,13 @@ services:
     timeout: 30
     waiting-time: 60
     inverted: false
-    notification-channels: ["telegram"]
+    notification-channels: ["Telegram"]
     spec:
       url: http://www.google.com
       method: POST
       headers:
         content-type: application/json
-        authentication: bearer 
+        Authorization: <auth-scheme> <authorization-parameters>
       expected-status: 201
       body: '{"ID": 4524}'
   - name: My Tcp Service
@@ -26,7 +26,7 @@ services:
     timeout: 30
     waiting-time: 60
     inverted: false
-    notification-channels: ["telegram"]
+    notification-channels: ["Telegram"]
     spec:
       host: www.google.com
       port: 3000
@@ -35,7 +35,7 @@ services:
     timeout: 30
     waiting-time: 60
     inverted: false
-    notification-channels: ["telegram"]
+    notification-channels: ["Telegram"]
     spec:
       host: www.google.com
       ping-count: 4
@@ -47,7 +47,7 @@ port-forward:
     username: <YourUsername>
     password: <YourPassword>
 notification-channels:
-  - name: telegram
+  - name: Telegram
     type: telegram
     spec:
       token:
