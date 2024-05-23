@@ -30,14 +30,14 @@ func compHttpResult(t *testing.T, service *HttpService) {
 		name:                 "My Http Service",
 		inverted:             false,
 		waitingTime:          60 * time.Second,
-		notificationChannels: []string{"telegram"},
+		notificationChannels: []string{"Telegram"},
 		state:                NoStatus,
 		HttpServiceSpec: HttpServiceSpec{
 			Url:    "http://www.google.com",
 			Method: "POST",
 			RequestHeaders: map[string]string{
-				"content-type":   "application/json",
-				"authentication": "bearer",
+				"content-type":  "application/json",
+				"Authorization": "<auth-scheme> <authorization-parameters>",
 			},
 			ExpectedStatusCode: 201,
 			RequestBody:        "{\"ID\": 4524}",
@@ -65,7 +65,7 @@ func compTcpResult(t *testing.T, service *TcpService) {
 	var tcp_result = TcpService{
 		name:                 "My Tcp Service",
 		inverted:             false,
-		notificationChannels: []string{"telegram"},
+		notificationChannels: []string{"Telegram"},
 		waitingTime:          60 * time.Second,
 		state:                NoStatus,
 		TcpServiceSpec: TcpServiceSpec{
@@ -89,7 +89,7 @@ func compPingResult(t *testing.T, service *PingService) {
 	var ping_result = PingService{
 		name:                 "My Ping Service",
 		inverted:             false,
-		notificationChannels: []string{"telegram"},
+		notificationChannels: []string{"Telegram"},
 		waitingTime:          60 * time.Second,
 		state:                NoStatus,
 		PingServiceSpec: PingServiceSpec{
