@@ -159,7 +159,7 @@ services:
     notification-channels: ["Telegram"]
     spec:
       host: www.google.com
-      port: 3000
+      port: 80
 ```
 
 ##### Ping
@@ -272,7 +272,7 @@ port-forward:
 
 ### Run it
 
-To use this tool you can download the binary file or [compile it by yourself](). Then Execute the command bellow to run it:
+To use this tool you can [download the binary file]() or [build it by yourself](#how-to-compile-it). Then Execute the command bellow to run it:
 
 ```bash
 uptime -f uptime-config.yml
