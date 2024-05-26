@@ -70,7 +70,7 @@ func compTcpResult(t *testing.T, service *TcpService) {
 		state:                NoStatus,
 		TcpServiceSpec: TcpServiceSpec{
 			HostName: "www.google.com",
-			Port:     3000,
+			Port:     80,
 		},
 	}
 	assert.Equal(t, service.state, tcp_result.state)

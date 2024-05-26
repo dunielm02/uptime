@@ -19,7 +19,7 @@ This tool can be hosted anywhere because it is a really light tool and can acces
       - [Discord](#discord)
       - [Telegram](#telegram)
     - [Ssh tools](#ssh-tools)
-      - [Port Frowarding](#portforwarding)
+      - [Port Forwarding](#portforwarding)
   - [Run the tool](#run-it)
 - [Compile](#how-to-compile-it)
   - [Windows](#windows)
