@@ -1,8 +1,8 @@
 # Uptime
 
-Uptime is a tool used to monitor all kind of services and **notify the state** of every one of them in **real time** by many notifications channels as Slack, Google Workspace, Microsoft Teams, etc.
+Uptime is a tool used to monitor all kind of services and **notify the state** of every one of them in **real time** by many notifications channels as Slack, Google Workspace, Microsoft Teams, etc. It also can access to protected services via ssh.
 
-This tool can be hosted anywhere because it is a really light tool and can access to protected services via ssh.
+This is a really light tool so it can be hosted anywhere.
 
 - [How to Use](#how-to-use)
   - [Define your services in a config file](#define-your-services-in-a-config-file)
